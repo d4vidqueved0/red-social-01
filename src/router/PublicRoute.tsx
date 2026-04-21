@@ -1,0 +1,14 @@
+import { FullscreenLoader } from "@/components/ui/index";
+import { useAuthStore } from "@/store/authStore";
+import type { ReactNode } from "react";
+import { Navigate } from "react-router";
+
+export function PublicRoute({ children }: { children: ReactNode }) {
+  const { session } = useAuthStore();
+
+  if (session === undefined) return <FullscreenLoader />;
+
+  if (session) return <Navigate to={"/feed"} />;
+
+  return children;
+}
