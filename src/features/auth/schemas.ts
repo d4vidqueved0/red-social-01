@@ -17,3 +17,16 @@ export const registerSchema = loginSchema.extend({
 })
 
 export type registerSchemaType = z.infer<typeof registerSchema>
+
+export const justEmail = loginSchema.pick({ email: true })
+
+export type justEmailType = z.infer<typeof justEmail>
+
+export const passwordReset = z.object({
+    password: z.string().min(8, 'Ingrese al menos 8 caracteres.').regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/, 'La contraseña debe contener al menos una letra mayuscula, minuscula, numero y caracter (@$!%*?&)'),
+    password_confirm: z.string().min(8, 'Ingrese al menos 8 caracteres.')
+}).refine(registro => registro.password === registro.password_confirm, {
+    path: ['password_confirm'],
+    message: 'Las contraseñas no coinciden.'
+})
+export type passwordResetType = z.infer<typeof passwordReset>

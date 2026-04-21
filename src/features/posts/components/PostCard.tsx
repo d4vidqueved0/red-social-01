@@ -23,12 +23,12 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
 
   return (
     <>
-      <div className="flex flex-col rounded-xl bg-black/50 border w-full max-w-2xl ps-1 p-5 mx-auto">
-        <div className="grid grid-cols-[2fr_9fr] sm:grid-cols-[1fr_10fr] w-full">
+      <div className="flex flex-col rounded-xl bg-black/50 border w-full max-w-2xl p-5 mx-auto">
+        <div className="grid grid-cols-[1fr_9fr] sm:grid-cols-[1fr_11fr] w-full gap-3">
           <div>
             <SkeletonImg
               className="m-0 rounded-full overflow-hidden"
-              img={avatar_url ?? "/stock.png"}
+              img={avatar_url ?? "/stock.webp"}
             />
           </div>
 
@@ -40,7 +40,7 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
             <small>@{username}</small>
           </div>
         </div>
-        <div className="grid grid-cols-[2fr_9fr] sm:grid-cols-[1fr_10fr] grow">
+        <div className="grid grid-cols-[1fr_9fr] sm:grid-cols-[1fr_11fr] grow gap-3">
           <div className="flex justify-center grow items-end">
             {session?.user.id === post.user_id && (
               <Button

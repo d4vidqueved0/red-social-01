@@ -24,6 +24,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
+import { signInGoogle } from "../api/signInGoogle";
 import { loginSchema, type loginSchemaType } from "../schemas";
 import { useShowPass } from "./useShowPass";
 
@@ -88,7 +89,12 @@ export function LoginForm() {
               name="password"
               render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel>Contraseña</FieldLabel>
+                  <div className="flex justify-between items-center">
+                    <FieldLabel>Contraseña</FieldLabel>
+                    <NavLink to={"/auth/send_reset_password"}>
+                      ¿Olvidaste la contraseña?
+                    </NavLink>
+                  </div>
                   <InputGroup>
                     <InputGroupInput
                       {...field}
@@ -113,15 +119,23 @@ export function LoginForm() {
           </FieldGroup>
         </form>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-3">
         <Button
           form="login-form"
           type="submit"
-          className="cursor-pointer"
+          className="w-full"
           variant={"default"}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+        </Button>
+        <Button
+          onClick={signInGoogle}
+          type="button"
+          variant={"secondary"}
+          className="w-full"
+        >
+          Iniciar sesión con Google
         </Button>
       </CardFooter>
     </Card>

@@ -25,18 +25,18 @@ export function usePostsRealtime() {
           }
         },
       )
-      .on(
-        "postgres_changes",
-        {
-          event: "DELETE",
-          schema: "public",
-          table: "posts",
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["posts"] });
-          resetNewPosts();
-        },
-      )
+      // .on(
+      //   "postgres_changes",
+      //   {
+      //     event: "DELETE",
+      //     schema: "public",
+      //     table: "posts",
+      //   },
+      //   () => {
+      //     queryClient.invalidateQueries({ queryKey: ["posts"] });
+      //     resetNewPosts();
+      //   },
+      // )
       .subscribe();
 
     return () => {

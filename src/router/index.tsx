@@ -1,5 +1,7 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
+import { ResetPassword } from "@/features/auth/components/ResetPassword";
+import { SendResetPassword } from "@/features/auth/components/SendResetPassword";
 import { FeedPage } from "@/features/posts/components/FeedPage";
 import { createBrowserRouter, Navigate } from "react-router";
 import { AppLayout } from "./AppLayout";
@@ -28,6 +30,22 @@ export const router = createBrowserRouter([
               <PublicRoute>
                 <LoginForm />
               </PublicRoute>
+            ),
+          },
+          {
+            path: "/auth/send_reset_password",
+            element: (
+              <PublicRoute>
+                <SendResetPassword />
+              </PublicRoute>
+            ),
+          },
+          {
+            path: "/auth/reset_password",
+            element: (
+              <ProtectedRoute>
+                <ResetPassword />
+              </ProtectedRoute>
             ),
           },
           {
