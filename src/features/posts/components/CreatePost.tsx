@@ -24,6 +24,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
+import { ImagePlus, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ export function CreatePost() {
     handleSubmit,
     reset,
     register,
+    setValue,
     formState: { isSubmitting, errors },
   } = useForm<postSchemaType>({
     resolver: zodResolver(postSchema),
@@ -138,26 +140,47 @@ export function CreatePost() {
 
             <Field>
               <FieldLabel>Imagen</FieldLabel>
-              <input
-                aria-invalid={Boolean(errors.file)}
-                {...restRegisters}
-                onChange={(ev) => {
-                  onChange(ev);
-                  const file = ev.target.files?.[0];
-                  if (file) setPreview(URL.createObjectURL(file));
-                  else {
-                    setPreview(null);
-                  }
-                }}
-                type="file"
-                accept="image/*"
-              />
+              <div className="relative max-w-fit overflow-hidden">
+                <ImagePlus size={100} className="border rounded-2xl p-3" />
+                <input
+                  className="absolute top-0 h-full opacity-0"
+                  aria-invalid={Boolean(errors.file)}
+                  {...restRegisters}
+                  onChange={(ev) => {
+                    onChange(ev);
+                    const file = ev.target.files?.[0];
+                    console.log(file);
+                    if (file) setPreview(URL.createObjectURL(file));
+                    else {
+                      setPreview(null);
+                    }
+                  }}
+                  type="file"
+                  accept="image/*"
+                />
+              </div>
+
               <FieldError>{errors.file?.message}</FieldError>
               {preview && !errors.file && (
-                <img
-                  className="max-w-xs w-full object-contain mx-auto"
-                  src={preview}
-                />
+                <>
+                  <div className="relative max-w-fit">
+                    <img
+                      className="max-w-xs w-full object-contain"
+                      src={preview}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setValue("file", undefined);
+                        URL.revokeObjectURL(preview);
+                        setPreview(null);
+                      }}
+                      className="rounded-full m-1 absolute top-0 right-0"
+                    >
+                      <XIcon />
+                    </Button>
+                  </div>
+                </>
               )}
             </Field>
             <Controller

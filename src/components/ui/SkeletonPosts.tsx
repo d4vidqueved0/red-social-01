@@ -1,22 +1,28 @@
 import { useState } from "react";
 
-export function SkeletonPosts({ img }: { img: string }) {
+export function SkeletonImg({
+  img,
+  className = "my-3",
+}: {
+  img: string;
+  className?: string;
+}) {
   const [isLoading, setLoading] = useState(true);
 
   return (
-    <div className="my-3 relative">
+    <div className={`${className} relative`}>
       <img
         onLoad={() => {
           setLoading(false);
         }}
         className={
-          (isLoading ? "absolute" : " ") +
+          (isLoading ? "absolute opacity-0" : " ") +
           ` object-cover w-full max-w-xl mx-auto`
         }
         src={img}
       />
       {isLoading && (
-        <div className="animate-pulse rounded-xl w-xl aspect-square bg-gray-600"></div>
+        <div className="animate-pulse rounded-xl w-full max-w-xl aspect-square bg-gray-600"></div>
       )}
     </div>
   );

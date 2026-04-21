@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
-import { SkeletonPosts } from "@/components/ui/SkeletonPosts";
+import { SkeletonImg } from "@/components/ui/SkeletonPosts";
 import { useAuthStore } from "@/store/authStore";
 import dayjs from "dayjs";
 import { TrashIcon } from "lucide-react";
@@ -24,11 +24,11 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
   return (
     <>
       <div className="flex flex-col rounded-xl bg-black/50 border w-full max-w-2xl ps-1 p-5 mx-auto">
-        <div className="grid grid-cols-[1fr_9fr] w-full">
+        <div className="grid grid-cols-[2fr_9fr] sm:grid-cols-[1fr_10fr] w-full">
           <div>
-            <img
-              className="rounded-full max-w-16"
-              src={avatar_url ?? "/stock.png"}
+            <SkeletonImg
+              className="m-0 rounded-full overflow-hidden"
+              img={avatar_url ?? "/stock.png"}
             />
           </div>
 
@@ -40,7 +40,7 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
             <small>@{username}</small>
           </div>
         </div>
-        <div className="grid grid-cols-[1fr_9fr] grow">
+        <div className="grid grid-cols-[2fr_9fr] sm:grid-cols-[1fr_10fr] grow">
           <div className="flex justify-center grow items-end">
             {session?.user.id === post.user_id && (
               <Button
@@ -56,9 +56,9 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
           </div>
           <div>
             <p className="break-all">{content}</p>
-            {post.image_url && <SkeletonPosts img={post.image_url} />}
+            {post.image_url && <SkeletonImg img={post.image_url} />}
 
-            <div className="flex justify-between mt-5">
+            <div className="flex justify-between mt-5 sm:flex-row flex-col gap-3 sm:gap-0">
               <Badge className="text-xs" variant={"default"}>
                 {category &&
                   category?.charAt(0).toUpperCase() +
