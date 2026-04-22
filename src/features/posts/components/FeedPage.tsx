@@ -3,6 +3,7 @@ import { useFeedStore } from "@/store/feedStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowBigUpIcon } from "lucide-react";
 import { useState } from "react";
+import { useInfiniteScroll } from "../hooks/useInfinityQuery";
 import { usePostsQuery } from "../hooks/usePostsQuery";
 import { usePostsRealtime } from "../hooks/usePostsRealtime";
 import { CreatePost } from "./CreatePost";
@@ -10,9 +11,24 @@ import { DeletePost } from "./DeletePost";
 import { PostList } from "./PostList";
 
 export function FeedPage() {
-  const { data, isError, isFetching, isLoading } = usePostsQuery();
+  const {
+    data,
+    isError,
+    isFetching,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePostsQuery();
 
   usePostsRealtime();
+
+  const { observerRef } = useInfiniteScroll({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  });
+
   const { newPostsCount, resetNewPosts } = useFeedStore();
 
   const queryClient = useQueryClient();
@@ -28,6 +44,8 @@ export function FeedPage() {
     setDelete(id);
   };
 
+  const posts = data?.pages.flatMap((page) => page.data) ?? [];
+
   return (
     <>
       <CreatePost />
@@ -38,10 +56,14 @@ export function FeedPage() {
           </Button>
         </div>
       )}
+
       {isLoading && <FullscreenLoader />}
-      {!isFetching && data && (
+
+      {data && (
         <>
-          <PostList posts={data} handleDelete={handleDelete} />
+          <PostList posts={posts} handleDelete={handleDelete} />
+          <div className="mx-auto w-full min-h-12" ref={observerRef}></div>
+
           <Button
             onClick={() => {
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -57,7 +79,8 @@ export function FeedPage() {
           )}
         </>
       )}
-      {!isFetching && data?.length === 0 && (
+
+      {!isFetching && posts?.length === 0 && (
         <div className="text-center">No hay publicaciones.</div>
       )}
       {!isFetching && isError && (

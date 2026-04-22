@@ -40,14 +40,14 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
             <small>@{username}</small>
           </div>
         </div>
-        <div className="grid grid-cols-[1fr_9fr] sm:grid-cols-[1fr_11fr] grow gap-3">
+        <div className="grid grid-cols-[1fr_9fr] sm:grid-cols-[1fr_11fr] w-full gap-3">
           <div className="flex justify-center grow items-end">
             {session?.user.id === post.user_id && (
               <Button
                 onClick={() => {
                   handleDelete(post.id);
                 }}
-                className="w-fit h-fit"
+                className="w-fit h-fit p-0"
                 variant={"link"}
               >
                 <TrashIcon />

@@ -24,7 +24,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
-import { ImagePlus, XIcon } from "lucide-react";
+import { ChevronDown, ImagePlus, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -98,17 +98,27 @@ export function CreatePost() {
     };
   }, [preview]);
 
+  const [isShow, setShow] = useState(false);
+
+  const handleShow = () => {
+    setShow((prev) => !prev);
+  };
+
   return (
     <>
       <Card className="max-w-2xl w-full mx-auto mt-12">
         <form
-          className="px-3"
+          className={`px-3 `}
           id="create-post-form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <h2 className="text-xl font-semibold mb-3">Añadir publicacion</h2>
-
-          <FieldGroup>
+          <div className="flex justify-between">
+            <h2 className="text-xl font-semibold mb-3">Añadir publicacion</h2>
+            <Button onClick={handleShow} type="button">
+              <ChevronDown />
+            </Button>
+          </div>
+          <FieldGroup className={isShow ? "flex" : "hidden"}>
             <Controller
               control={control}
               name="content"
@@ -149,7 +159,6 @@ export function CreatePost() {
                   onChange={(ev) => {
                     onChange(ev);
                     const file = ev.target.files?.[0];
-                    console.log(file);
                     if (file) setPreview(URL.createObjectURL(file));
                     else {
                       setPreview(null);
@@ -219,15 +228,15 @@ export function CreatePost() {
                 </Field>
               )}
             />
+            <Button
+              className="mt-3"
+              disabled={isSubmitting}
+              form="create-post-form"
+              type="submit"
+            >
+              {isSubmitting ? "Publicando..." : "Publicar"}
+            </Button>
           </FieldGroup>
-          <Button
-            className="mt-3"
-            disabled={isSubmitting}
-            form="create-post-form"
-            type="submit"
-          >
-            {isSubmitting ? "Publicando..." : "Publicar"}
-          </Button>
         </form>
       </Card>
     </>
