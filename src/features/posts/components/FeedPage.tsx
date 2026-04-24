@@ -1,5 +1,6 @@
 import { Button, FullscreenLoader } from "@/components/ui";
 import { useFeedStore } from "@/store/feedStore";
+import type { Post } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowBigUpIcon } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { usePostsQuery } from "../hooks/usePostsQuery";
 import { usePostsRealtime } from "../hooks/usePostsRealtime";
 import { CreatePost } from "./CreatePost";
 import { DeletePost } from "./DeletePost";
+import { EditPost } from "./EditPost";
 import { PostList } from "./PostList";
 
 export function FeedPage() {
@@ -29,12 +31,15 @@ export function FeedPage() {
     isFetchingNextPage,
   });
 
-  const { newPostsCount, resetNewPosts } = useFeedStore();
+  const { newPostsCount, resetNewPosts, resetPostsLocales, resetFechaInicial } =
+    useFeedStore();
 
   const queryClient = useQueryClient();
 
   const handleNewPosts = () => {
     queryClient.invalidateQueries({ queryKey: ["posts"] });
+    resetPostsLocales();
+    resetFechaInicial();
     resetNewPosts();
   };
 
@@ -45,6 +50,23 @@ export function FeedPage() {
   };
 
   const posts = data?.pages.flatMap((page) => page.data) ?? [];
+
+  const [postEdit, setPostEdit] = useState<Post | null>(null);
+
+  const handleEdit = (post: Post | null) => {
+    if (post) {
+      setDialogEdit(true);
+    } else {
+      setDialogEdit(false);
+    }
+    setPostEdit(post);
+  };
+
+  const [dialogEdit, setDialogEdit] = useState(false);
+
+  const handleDialogEdit = () => {
+    setDialogEdit((prev) => !prev);
+  };
 
   return (
     <>
@@ -61,7 +83,12 @@ export function FeedPage() {
 
       {data && (
         <>
-          <PostList posts={posts} handleDelete={handleDelete} />
+          {console.log(postEdit)}
+          <PostList
+            posts={posts}
+            handleDelete={handleDelete}
+            handlePostEdit={handleEdit}
+          />
           <div className="mx-auto w-full min-h-12" ref={observerRef}></div>
 
           <Button
@@ -76,6 +103,14 @@ export function FeedPage() {
 
           {postDelete && (
             <DeletePost handleDelete={handleDelete} id={postDelete} />
+          )}
+          {postEdit && (
+            <EditPost
+              key={postEdit.id}
+              post={postEdit}
+              handleDialogEdit={handleDialogEdit}
+              open={dialogEdit}
+            />
           )}
         </>
       )}

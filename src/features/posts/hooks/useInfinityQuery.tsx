@@ -26,12 +26,12 @@ export function useInfiniteScroll({
       },
     );
     if (observerRef.current) {
-      observer.observe(observerRef.current); // ← falta esto
+      observer.observe(observerRef.current);
     }
     return () => {
       observer.disconnect();
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  return { observerRef }; // FeedPage necesita la ref para el div centinela
+  return { observerRef };
 }

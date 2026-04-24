@@ -7,9 +7,21 @@ export function RootLayout() {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       useAuthStore.getState().setSession(session);
-      useAuthStore.getState().setUser(session?.user ?? null);
+      if (session) {
+        (async () => {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          console.log(data);
+          useAuthStore.getState().setProfile(data);
+        })();
+      } else if (event === "SIGNED_OUT") {
+        useAuthStore.getState().setProfile(null);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);

@@ -1,17 +1,36 @@
-import { Button } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { SkeletonImg } from "@/components/ui/SkeletonPosts";
 import { useAuthStore } from "@/store/authStore";
+import type { Post } from "@/types";
 import dayjs from "dayjs";
-import { TrashIcon } from "lucide-react";
+import {
+  EllipsisVertical,
+  Heart,
+  MessageCircle,
+  Pencil,
+  Share2,
+  Trash,
+} from "lucide-react";
 import type { PostWithProfile } from "../types";
 
 interface PostCardProps {
   post: PostWithProfile;
   handleDelete: (id: string) => void;
+  handlePostEdit: (post: Post | null) => void;
 }
 
-export function PostCard({ post, handleDelete }: PostCardProps) {
+export function PostCard({
+  post,
+  handleDelete,
+  handlePostEdit,
+}: PostCardProps) {
   const {
     content,
     created_at,
@@ -35,25 +54,41 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
           <div className="flex flex-col mb-2">
             <div className="flex justify-between items-center">
               <h3 className="lg:text-xl">{name}</h3>
-              <small>{dayjs(created_at).fromNow()}</small>
+              {post.user_id === session?.user.id ? (
+                <div className="flex items-center lg:gap-3">
+                  <small>{dayjs(created_at).fromNow()}</small>
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger>
+                      <EllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="z-40">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem onClick={() => handlePostEdit(post)}>
+                          <Pencil />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            handleDelete(post.id);
+                          }}
+                          variant="destructive"
+                        >
+                          <Trash />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                <small>{dayjs(created_at).fromNow()}</small>
+              )}
             </div>
             <small>@{username}</small>
           </div>
         </div>
         <div className="grid grid-cols-[1fr_9fr] sm:grid-cols-[1fr_11fr] w-full gap-3">
-          <div className="flex justify-center grow items-end">
-            {session?.user.id === post.user_id && (
-              <Button
-                onClick={() => {
-                  handleDelete(post.id);
-                }}
-                className="w-fit h-fit p-0"
-                variant={"link"}
-              >
-                <TrashIcon />
-              </Button>
-            )}
-          </div>
+          <div className="flex justify-center grow items-end"></div>
           <div>
             <p className="break-all">{content}</p>
             {post.image_url && <SkeletonImg img={post.image_url} />}
@@ -67,6 +102,24 @@ export function PostCard({ post, handleDelete }: PostCardProps) {
               <small className="text-xs lg:text-md">
                 {dayjs(created_at).format("DD [de] MMMM [del] YYYY [-] hh:mmA")}
               </small>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-[1fr_9fr] sm:grid-cols-[1fr_11fr] w-full gap-3 mt-7 ">
+          <div></div>
+          <div className="flex justify-between">
+            <div>
+              <Share2 size={24} />
+            </div>
+            <div className="flex gap-8">
+              <div className="flex gap-2">
+                <MessageCircle size={24} />
+                {2}
+              </div>
+              <div className="flex gap-2">
+                <Heart size={24} />
+                {12}
+              </div>
             </div>
           </div>
         </div>

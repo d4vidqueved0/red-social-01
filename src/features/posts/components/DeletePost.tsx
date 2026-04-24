@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/lib/supabase";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 interface deletePostProps {
@@ -18,15 +17,12 @@ interface deletePostProps {
 }
 
 export function DeletePost({ id, handleDelete }: deletePostProps) {
-  const queryClient = useQueryClient();
-
   const handleDeletePost = async (id: string) => {
     const { error } = await supabase.from("posts").delete().eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
     }
-    queryClient.invalidateQueries({ queryKey: ["posts"] });
     toast.success("Se eliminó la publicacion.");
   };
 

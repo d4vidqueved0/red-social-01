@@ -1,14 +1,16 @@
 import { supabase } from "@/lib/supabase";
+import type { Dayjs } from "dayjs";
 
-const PAGE_SIZE = 7
+const PAGE_SIZE = 4
 
-export async function getPosts({ pageParam = 0 }: { pageParam: number }) {
+
+export async function getPosts({ pageParam }: { pageParam: Dayjs | string }) {
     const { data, error } = await supabase
         .from('posts')
         .select(`*, profiles (username, avatar_url, name)`)
         .order('created_at', { ascending: false })
-        .range(pageParam, pageParam + PAGE_SIZE - 1)
+        .lt('created_at', pageParam).limit(PAGE_SIZE)
 
     if (error) throw error
-    return { data, nextPage: data.length === PAGE_SIZE ? pageParam + PAGE_SIZE : null }
+    return { data, nextPage: data.length !== 0 ? data[data.length - 1].created_at : null }
 }

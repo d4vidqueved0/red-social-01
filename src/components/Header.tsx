@@ -3,9 +3,18 @@ import { useAuthStore } from "@/store/authStore";
 import { NavLink } from "react-router";
 import { toast } from "sonner";
 import { Button } from "./ui";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function Header() {
-  const { session } = useAuthStore();
+  const { session, profile } = useAuthStore();
 
   const handleSession = async () => {
     const { error } = await supabase.auth.signOut();
@@ -23,11 +32,37 @@ export function Header() {
           <NavLink to={"/feed"}>Inicio</NavLink>
         </div>
 
-        {session ? (
-          <Button variant={"link"} onClick={handleSession}>
-            Cerrar sesión
-          </Button>
-        ) : (
+        {session && (
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className=" flex gap-3 items-center">
+                {profile?.name}
+                {profile && (
+                  <Avatar>
+                    <AvatarImage
+                      src={profile?.avatar_url || "stock.webp"}
+                      alt="shadcn"
+                    />
+                    <AvatarFallback>{profile?.name}</AvatarFallback>
+                  </Avatar>
+                )}
+              </Button>
+            </DropdownMenuTrigger>{" "}
+            <DropdownMenuContent className="w-32">
+              <DropdownMenuGroup>
+                <DropdownMenuItem>Perfil</DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={handleSession} variant="destructive">
+                  Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {session === null && (
           <NavLink to={"/auth/login"}>Iniciar sesión</NavLink>
         )}
       </nav>

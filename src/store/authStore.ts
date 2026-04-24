@@ -1,16 +1,18 @@
-import type { Session, User } from '@supabase/supabase-js'
+import type { Profile } from '@/types'
+import type { Session } from '@supabase/supabase-js'
 import { create } from 'zustand'
 
 interface useAuthStoreProps {
-    user: User | null | undefined
-    session: Session | null | undefined
-    setUser: (user: User | null) => void
+    profile: Profile | null | undefined
+    session: Session | null | undefined,
+    setProfile: (profile: Profile | null) => void
     setSession: (session: Session | null) => void
 }
 
 export const useAuthStore = create<useAuthStoreProps>((set) => ({
-    user: undefined,
+    profile: undefined,
     session: undefined,
-    setUser: (user) => set(({ user })),
-    setSession: (session) => set(({ session }))
+    setProfile: (profile) => set(({ profile })),
+    setSession: (session) => set(({ session })),
+
 }))

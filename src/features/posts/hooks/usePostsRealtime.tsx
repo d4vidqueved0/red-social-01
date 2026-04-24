@@ -1,12 +1,26 @@
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
 import { useFeedStore } from "@/store/feedStore";
-import { useQueryClient } from "@tanstack/react-query";
+import type { Post } from "@/types";
+import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useEffect } from "react";
+import type { PostsPage, PostWithProfile } from "../types";
+import { inCachePosts } from "../utils/inCachePosts";
+import { updateCachePosts } from "../utils/updateCachePosts";
 
 export function usePostsRealtime() {
-  const { incrementNewPosts, resetNewPosts } = useFeedStore();
-  const { session } = useAuthStore();
+  const {
+    incrementNewPosts,
+    resetNewPosts,
+    decrementNewPosts,
+    fechaInicial,
+    postsLocales,
+    updatePostLocal,
+    deletePostLocal,
+    setPostsLocales,
+  } = useFeedStore();
+
+  const { session, profile } = useAuthStore();
 
   const queryClient = useQueryClient();
 
@@ -18,8 +32,18 @@ export function usePostsRealtime() {
         { event: "INSERT", schema: "public", table: "posts" },
         (info) => {
           if (info.new.user_id === session?.user.id) {
-            resetNewPosts();
-            queryClient.invalidateQueries({ queryKey: ["posts"] });
+            console.log(info.new);
+            if (!profile) return;
+            const newPostWithProfile: PostWithProfile = {
+              ...(info.new as Post),
+              profiles: {
+                name: profile.name,
+                username: profile.username,
+                avatar_url: profile.avatar_url,
+              },
+            };
+            console.log(newPostWithProfile);
+            setPostsLocales(newPostWithProfile);
           } else {
             incrementNewPosts();
           }
@@ -32,9 +56,62 @@ export function usePostsRealtime() {
           schema: "public",
           table: "posts",
         },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["posts"] });
-          resetNewPosts();
+        (info) => {
+          let inCache;
+          const idPost = info.old.id;
+
+          queryClient.setQueryData(
+            ["posts", fechaInicial],
+            (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
+              inCache = inCachePosts(cacheActual, idPost);
+              if (!inCache) {
+                return cacheActual;
+              }
+              const operation = (data: PostWithProfile[]) => {
+                return data.filter((post) => post.id !== idPost);
+              };
+              return updateCachePosts(cacheActual, operation);
+            },
+          );
+          const existe = postsLocales.find((p) => p.id === idPost);
+          if (existe) {
+            deletePostLocal(idPost);
+          }
+          if (!inCache && !existe) {
+            decrementNewPosts();
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "posts",
+        },
+        (info) => {
+          let inCache;
+          const idPost = info.new.id;
+          queryClient.setQueryData(
+            ["posts", fechaInicial],
+            (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
+              inCache = inCachePosts(cacheActual, idPost);
+              if (!inCache) {
+                return cacheActual;
+              }
+              const operation = (data: PostWithProfile[]) => {
+                return data.map((post) =>
+                  post.id === info.new.id ? { ...post, ...info.new } : post,
+                );
+              };
+              return updateCachePosts(cacheActual, operation);
+            },
+          );
+
+          if (info.new.user_id === profile?.id) {
+            const postLocal = postsLocales.find((post) => post.id === idPost);
+            if (postLocal) updatePostLocal({ ...postLocal, ...info.new });
+          }
         },
       )
       .subscribe();
@@ -42,5 +119,17 @@ export function usePostsRealtime() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [incrementNewPosts, queryClient, resetNewPosts, session]);
+  }, [
+    incrementNewPosts,
+    queryClient,
+    resetNewPosts,
+    session,
+    decrementNewPosts,
+    profile,
+    setPostsLocales,
+    fechaInicial,
+    postsLocales,
+    updatePostLocal,
+    deletePostLocal,
+  ]);
 }

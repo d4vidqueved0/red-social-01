@@ -1,12 +1,14 @@
-import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
+import { useFeedStore } from "@/store/feedStore";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPosts } from "../api/postApi";
-import type { PostsPage } from "../types";
 
 export function usePostsQuery() {
-  return useInfiniteQuery<PostsPage, Error, InfiniteData<PostsPage>, string[], number>({
-    queryKey: ["posts"],
+  const { fechaInicial } = useFeedStore();
+
+  return useInfiniteQuery({
+    queryKey: ["posts", fechaInicial],
     queryFn: getPosts,
-    initialPageParam: 0,
+    initialPageParam: fechaInicial,
     getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
   });
 }
