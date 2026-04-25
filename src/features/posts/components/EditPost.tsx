@@ -35,7 +35,7 @@ export function EditPost({ post, handleDialogEdit, open }: EditPostProps) {
     resolver: zodResolver(postSchema),
     mode: "onChange",
     defaultValues: {
-      content: post.content,
+      content: post.content || '',
       category: post.category as (typeof CATEGORIES)[number],
       file: undefined,
     },
