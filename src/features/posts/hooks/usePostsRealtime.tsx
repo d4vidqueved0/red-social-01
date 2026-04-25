@@ -4,7 +4,7 @@ import { useFeedStore } from "@/store/feedStore";
 import type { Post } from "@/types";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useEffect } from "react";
-import type { PostsPage, PostWithProfile } from "../types";
+import type { PostsPage, PostWithProfileAndLikes } from "../types";
 import { inCachePosts } from "../utils/inCachePosts";
 import { updateCachePosts } from "../utils/updateCachePosts";
 
@@ -34,13 +34,15 @@ export function usePostsRealtime() {
           if (info.new.user_id === session?.user.id) {
             console.log(info.new);
             if (!profile) return;
-            const newPostWithProfile: PostWithProfile = {
+            const newPostWithProfile: PostWithProfileAndLikes = {
               ...(info.new as Post),
               profiles: {
                 name: profile.name,
                 username: profile.username,
                 avatar_url: profile.avatar_url,
               },
+              likes: [{ count: 0 }],
+              user_likes: [],
             };
             console.log(newPostWithProfile);
             setPostsLocales(newPostWithProfile);
@@ -67,7 +69,7 @@ export function usePostsRealtime() {
               if (!inCache) {
                 return cacheActual;
               }
-              const operation = (data: PostWithProfile[]) => {
+              const operation = (data: PostWithProfileAndLikes[]) => {
                 return data.filter((post) => post.id !== idPost);
               };
               return updateCachePosts(cacheActual, operation);
@@ -99,7 +101,7 @@ export function usePostsRealtime() {
               if (!inCache) {
                 return cacheActual;
               }
-              const operation = (data: PostWithProfile[]) => {
+              const operation = (data: PostWithProfileAndLikes[]) => {
                 return data.map((post) =>
                   post.id === info.new.id ? { ...post, ...info.new } : post,
                 );

@@ -1,19 +1,19 @@
-import type { PostWithProfile } from "@/features/posts/types";
+import type { PostWithProfileAndLikes } from "@/features/posts/types";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { create } from "zustand";
 
 interface useFeedStoreProps {
     newPostsCount: number
-    postsLocales: PostWithProfile[] | [],
+    postsLocales: PostWithProfileAndLikes[] | [],
     fechaInicial: Dayjs
     incrementNewPosts: () => void
     decrementNewPosts: () => void
     resetNewPosts: () => void
-    setPostsLocales: (post: PostWithProfile) => void
+    setPostsLocales: (post: PostWithProfileAndLikes) => void
     resetPostsLocales: () => void
     resetFechaInicial: () => void
-    updatePostLocal: (post: PostWithProfile) => void
+    updatePostLocal: (post: PostWithProfileAndLikes) => void
     deletePostLocal: (id: string) => void
 }
 

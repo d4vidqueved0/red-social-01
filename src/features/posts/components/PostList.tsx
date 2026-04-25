@@ -1,10 +1,10 @@
 import { useFeedStore } from "@/store/feedStore";
 import type { Post } from "@/types";
-import type { PostWithProfile } from "../types";
+import type { PostWithProfileAndLikes } from "../types";
 import { PostCard } from "./PostCard";
 
 interface PostListProps {
-  posts: PostWithProfile[] | undefined;
+  posts: PostWithProfileAndLikes[] | undefined;
   handleDelete: (id: string) => void;
   handlePostEdit: (post: Post | null) => void;
 }
