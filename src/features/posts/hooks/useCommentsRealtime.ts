@@ -31,10 +31,8 @@ export function useCommentsRealtime(postID: string | undefined) {
           table: "comments",
           filter: `post_id=eq.${postID}`,
         },
-        (info) => {
-          console.log(info)
+        () => {
           queryClient.invalidateQueries({ queryKey: commentsKeys.comments(postID) })
-
         }
       )
       .subscribe();

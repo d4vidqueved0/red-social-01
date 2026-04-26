@@ -7,19 +7,12 @@ import { useEffect } from "react";
 import { postKeys } from "../keys.posts";
 import type { PostsPage, PostWithProfileAndLikes } from "../types";
 import { inCachePosts } from "../utils/inCachePosts";
+import { insertFirstPositionCache } from "../utils/insertFirstPositionCache";
 import { updateCachePosts } from "../utils/updateCachePosts";
 
 export function usePostsRealtime() {
-  const {
-    incrementNewPosts,
-    resetNewPosts,
-    decrementNewPosts,
-    fechaInicial,
-    postsLocales,
-    updatePostLocal,
-    deletePostLocal,
-    setPostsLocales,
-  } = useFeedStore();
+  const { incrementNewPosts, resetNewPosts, decrementNewPosts, fechaInicial } =
+    useFeedStore();
 
   const { session, profile } = useAuthStore();
 
@@ -33,7 +26,6 @@ export function usePostsRealtime() {
         { event: "INSERT", schema: "public", table: "posts" },
         (info) => {
           if (info.new.user_id === session?.user.id) {
-            console.log(info.new);
             if (!profile) return;
             const newPostWithProfile: PostWithProfileAndLikes = {
               ...(info.new as Post),
@@ -42,10 +34,18 @@ export function usePostsRealtime() {
               },
               likes: [{ count: 0 }],
               user_likes: [],
-              comments: [{count: 0}]
+              comments: [{ count: 0 }],
             };
-            console.log(newPostWithProfile);
-            setPostsLocales(newPostWithProfile);
+            queryClient.setQueryData(
+              postKeys.feed(fechaInicial),
+              (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
+                const newCache = insertFirstPositionCache(
+                  cacheActual,
+                  newPostWithProfile,
+                );
+                return newCache;
+              },
+            );
           } else {
             incrementNewPosts();
           }
@@ -75,11 +75,7 @@ export function usePostsRealtime() {
               return updateCachePosts(cacheActual, operation);
             },
           );
-          const existe = postsLocales.find((p) => p.id === idPost);
-          if (existe) {
-            deletePostLocal(idPost);
-          }
-          if (!inCache && !existe) {
+          if (!inCache) {
             decrementNewPosts();
           }
         },
@@ -109,11 +105,6 @@ export function usePostsRealtime() {
               return updateCachePosts(cacheActual, operation);
             },
           );
-
-          if (info.new.user_id === profile?.id) {
-            const postLocal = postsLocales.find((post) => post.id === idPost);
-            if (postLocal) updatePostLocal({ ...postLocal, ...info.new });
-          }
         },
       )
       .subscribe();
@@ -128,10 +119,6 @@ export function usePostsRealtime() {
     session,
     decrementNewPosts,
     profile,
-    setPostsLocales,
     fechaInicial,
-    postsLocales,
-    updatePostLocal,
-    deletePostLocal,
   ]);
 }

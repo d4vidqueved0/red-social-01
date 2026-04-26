@@ -20,6 +20,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 import { useToggleLike } from "../hooks/useToggleLike";
 import type { PostWithProfileAndLikes } from "../types";
 
@@ -47,7 +48,31 @@ export function PostCard({
 
   const navigate = useNavigate();
 
-  console.log(post);
+  const handleShare = async (id: string) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Publicacion de ${post.profiles.username}`,
+          text: 'Mira esta publicacion',
+          url: `${window.location.origin}/feed/post/${id}`,
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error("Error al compartir.");
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(
+          `${window.location.origin}/feed/post/${id}`,
+        );
+        toast.success("Enlace copiado.");
+      } catch (error) {
+        console.error(error);
+        toast.error("Error al copiar el enlace.");
+      }
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-[1fr_11fr] gap-x-3 sm:gap-0 rounded-xl bg-black/50 border w-full max-w-2xl p-5 mx-auto">
@@ -114,11 +139,18 @@ export function PostCard({
         <div></div>
         <div className="flex items-center justify-between mt-5">
           <div>
-            <Share2 size={24} />
+            <Share2
+              className="cursor-pointer transition-all active:scale-90"
+              onClick={() => {
+                handleShare(post.id);
+              }}
+              size={24}
+            />
           </div>
           <div className="flex gap-8">
             <div className="flex gap-2">
-              <MessageCircle className="cursor-pointer active:scale-90 transition-all"
+              <MessageCircle
+                className="cursor-pointer active:scale-90 transition-all"
                 onClick={() => {
                   navigate(`/feed/post/${post.id}`);
                 }}
