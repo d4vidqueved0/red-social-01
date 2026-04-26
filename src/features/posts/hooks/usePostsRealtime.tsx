@@ -42,7 +42,7 @@ export function usePostsRealtime() {
               },
               likes: [{ count: 0 }],
               user_likes: [],
-              comments: []
+              comments: [{count: 0}]
             };
             console.log(newPostWithProfile);
             setPostsLocales(newPostWithProfile);

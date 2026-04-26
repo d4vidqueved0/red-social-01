@@ -184,7 +184,8 @@ export function PostPage() {
                         <small>@{comment.profiles.username}</small>
                         <small className="flex gap-3">
                           {dayjs(comment.created_at).fromNow()}{" "}
-                          {comment.user_id === profile?.id && (
+                          {(comment.user_id === profile?.id ||
+                            data.user_id === profile?.id) && (
                             <Trash
                               className="cursor-pointer transition-all active:scale-90"
                               size={16}
