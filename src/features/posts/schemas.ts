@@ -18,3 +18,9 @@ export const postSchema = z.object({
 })
 
 export type postSchemaType = z.infer<typeof postSchema>
+
+export const commentSchema = z.object({
+    content: z.string().trim().min(1, 'Ingrese al menos un caracter.').max(200, 'Maximo 200 caracteres.')
+})
+
+export type commentSchemaType = z.infer<typeof commentSchema>

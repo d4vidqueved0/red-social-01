@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useInfiniteScroll } from "../hooks/useInfinityQuery";
 import { usePostsQuery } from "../hooks/usePostsQuery";
 import { usePostsRealtime } from "../hooks/usePostsRealtime";
+import { postKeys } from "../keys.posts";
 import { CreatePost } from "./CreatePost";
 import { DeletePost } from "./DeletePost";
 import { EditPost } from "./EditPost";
@@ -31,13 +32,18 @@ export function FeedPage() {
     isFetchingNextPage,
   });
 
-  const { newPostsCount, resetNewPosts, resetPostsLocales, resetFechaInicial } =
-    useFeedStore();
+  const {
+    newPostsCount,
+    resetNewPosts,
+    resetPostsLocales,
+    resetFechaInicial,
+    fechaInicial,
+  } = useFeedStore();
 
   const queryClient = useQueryClient();
 
   const handleNewPosts = () => {
-    queryClient.invalidateQueries({ queryKey: ["posts"] });
+    queryClient.invalidateQueries({ queryKey: postKeys.feed(fechaInicial) });
     resetPostsLocales();
     resetFechaInicial();
     resetNewPosts();
@@ -83,7 +89,6 @@ export function FeedPage() {
 
       {data && (
         <>
-          {console.log(postEdit)}
           <PostList
             posts={posts}
             handleDelete={handleDelete}
@@ -96,7 +101,7 @@ export function FeedPage() {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             size={"icon"}
-            className="rounded-full fixed z-50 bottom-0 right-0 m-3"
+            className="rounded-full fixed z-50 bottom-0 left-0 m-3"
           >
             <ArrowBigUpIcon />
           </Button>

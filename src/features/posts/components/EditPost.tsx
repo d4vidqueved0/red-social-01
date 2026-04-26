@@ -35,7 +35,7 @@ export function EditPost({ post, handleDialogEdit, open }: EditPostProps) {
     resolver: zodResolver(postSchema),
     mode: "onChange",
     defaultValues: {
-      content: post.content || '',
+      content: post.content || "",
       category: post.category as (typeof CATEGORIES)[number],
       file: undefined,
     },
@@ -104,7 +104,11 @@ export function EditPost({ post, handleDialogEdit, open }: EditPostProps) {
               Puedes editar los campos de tu publicaion
             </DialogDescription>
           </DialogHeader>
-          <form id="edit_post_form" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            id="edit_post_form"
+            className="max-h-96 md:max-h-none overflow-scroll no-scrollbar"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <PostForm
               control={control}
               errors={errors}

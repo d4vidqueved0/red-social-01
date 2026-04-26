@@ -40,10 +40,10 @@ export function Header() {
                 {profile && (
                   <Avatar>
                     <AvatarImage
-                      src={profile?.avatar_url || "stock.webp"}
+                      src={profile?.avatar_url || undefined}
                       alt="shadcn"
                     />
-                    <AvatarFallback>{profile?.name}</AvatarFallback>
+                    <AvatarFallback>{profile?.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                 )}
               </Button>

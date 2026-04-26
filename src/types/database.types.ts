@@ -16,21 +16,21 @@ export type Database = {
     Tables: {
       comments: {
         Row: {
-          content: string | null
+          content: string
           created_at: string
           id: string
           post_id: string | null
           user_id: string | null
         }
         Insert: {
-          content?: string | null
+          content: string
           created_at?: string
           id?: string
           post_id?: string | null
           user_id?: string | null
         }
         Update: {
-          content?: string | null
+          content?: string
           created_at?: string
           id?: string
           post_id?: string | null
@@ -42,6 +42,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

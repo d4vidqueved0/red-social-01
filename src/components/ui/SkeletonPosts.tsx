@@ -17,7 +17,7 @@ export function SkeletonImg({
         }}
         className={
           (isLoading ? "absolute opacity-0" : " ") +
-          ` object-cover w-full max-w-xl mx-auto`
+          ` object-cover w-full mx-auto`
         }
         src={img}
       />
