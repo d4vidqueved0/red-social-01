@@ -35,7 +35,6 @@ export function FeedPage() {
   const {
     newPostsCount,
     resetNewPosts,
-    resetPostsLocales,
     resetFechaInicial,
     fechaInicial,
   } = useFeedStore();
@@ -44,7 +43,6 @@ export function FeedPage() {
 
   const handleNewPosts = () => {
     queryClient.invalidateQueries({ queryKey: postKeys.feed(fechaInicial) });
-    resetPostsLocales();
     resetFechaInicial();
     resetNewPosts();
   };

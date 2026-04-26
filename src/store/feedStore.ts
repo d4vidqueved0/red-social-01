@@ -13,7 +13,6 @@ interface useFeedStoreProps {
 
 export const useFeedStore = create<useFeedStoreProps>((set) => ({
     newPostsCount: 0,
-    postsLocales: [],
     fechaInicial: dayjs(),
     incrementNewPosts: () => set((state) => (
         {
