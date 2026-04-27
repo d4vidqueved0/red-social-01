@@ -1,7 +1,6 @@
 import { Button, FullscreenLoader } from "@/components/ui";
 import { useFeedStore } from "@/store/feedStore";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowBigUpIcon } from "lucide-react";
 import { useDeletePost } from "../hooks/useDeletePost";
 import { useEditPost } from "../hooks/useEditPost";
 import { useInfiniteScroll } from "../hooks/useInfinityQuery";
@@ -67,16 +66,6 @@ export function FeedPage() {
             handlePostEdit={handleEdit}
           />
           <div className="mx-auto w-full min-h-12" ref={observerRef}></div>
-
-          <Button
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            size={"icon"}
-            className="rounded-full fixed z-50 bottom-0 left-0 m-3"
-          >
-            <ArrowBigUpIcon />
-          </Button>
 
           {postDelete && (
             <DeletePost handleDelete={handleDelete} id={postDelete} />

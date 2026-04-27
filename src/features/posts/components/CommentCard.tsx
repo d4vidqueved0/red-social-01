@@ -6,15 +6,16 @@ import type { Comment } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { Trash } from "lucide-react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import type { CommentWithProfile } from "../types";
 
 export function CommentCard({
   comment,
-  idPost,
+  idUser,
 }: {
   comment: CommentWithProfile;
-  idPost: string;
+  idUser: string | null;
 }) {
   const { profile } = useAuthStore();
 
@@ -36,9 +37,17 @@ export function CommentCard({
     },
   });
 
+  const navigate = useNavigate();
+
   return (
     <article className="grid grid-cols-[1fr_10fr] gap-1">
-      <Avatar>
+      <Avatar
+      className="cursor-pointer active:scale-90 transition-all"
+        onClick={() => {
+          if (window.location.pathname !== `/profile/${comment.user_id}`)
+            navigate(`/profile/${comment.user_id}`, { relative: "path" });
+        }}
+      >
         <AvatarImage src={comment.profiles.avatar_url || "stock.webp"} />
         <AvatarFallback>{comment.profiles.name.charAt(0)}</AvatarFallback>
       </Avatar>
@@ -47,11 +56,11 @@ export function CommentCard({
           <small>@{comment.profiles.username}</small>
           <small className="flex gap-3">
             {dayjs(comment.created_at).fromNow()}{" "}
-            {(comment.user_id === profile?.id || idPost === profile?.id) && (
+            {(comment.user_id === profile?.id || idUser === profile?.id) && (
               <Button
                 disabled={isPending}
                 type="button"
-                variant={"destructive"}
+                variant={"link"}
                 className="p-0 m-0 w-fit h-fit"
                 onClick={() => {
                   mutate(comment);

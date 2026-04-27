@@ -11,8 +11,7 @@ import { insertFirstPositionCache } from "../utils/insertFirstPositionCache";
 import { updateCachePosts } from "../utils/updateCachePosts";
 
 export function usePostsRealtime() {
-  const { incrementNewPosts, resetNewPosts, decrementNewPosts, fechaInicial } =
-    useFeedStore();
+  const { incrementNewPosts, decrementNewPosts, fechaInicial } = useFeedStore();
 
   const { session, profile } = useAuthStore();
 
@@ -36,6 +35,16 @@ export function usePostsRealtime() {
               user_likes: [],
               comments: [{ count: 0 }],
             };
+            queryClient.setQueryData(
+              postKeys.profile(profile.id),
+              (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
+                const newCache = insertFirstPositionCache(
+                  cacheActual,
+                  newPostWithProfile,
+                );
+                return newCache;
+              },
+            );
             queryClient.setQueryData(
               postKeys.feed(fechaInicial),
               (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
@@ -117,7 +126,6 @@ export function usePostsRealtime() {
   }, [
     incrementNewPosts,
     queryClient,
-    resetNewPosts,
     session,
     decrementNewPosts,
     profile,

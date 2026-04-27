@@ -161,7 +161,7 @@ export function PostPage() {
                   <CommentCard
                     key={comment.id}
                     comment={comment}
-                    idPost={data.id}
+                    idUser={data.user_id}
                   />
                 ))}
 

@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "./ui";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -15,6 +15,8 @@ import {
 
 export function Header() {
   const { session, profile } = useAuthStore();
+
+  const navigate = useNavigate();
 
   const handleSession = async () => {
     const { error } = await supabase.auth.signOut();
@@ -50,7 +52,13 @@ export function Header() {
             </DropdownMenuTrigger>{" "}
             <DropdownMenuContent className="w-32">
               <DropdownMenuGroup>
-                <DropdownMenuItem>Perfil</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigate(`/profile/${profile?.id}`, { relative: "path" });
+                  }}
+                >
+                  Perfil
+                </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>

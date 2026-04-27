@@ -77,7 +77,13 @@ export function PostCard({
     <>
       <div className="grid grid-cols-[1fr_11fr] gap-x-3 sm:gap-0 rounded-xl bg-black/50 border w-full max-w-2xl p-5 mx-auto">
         <div className="flex items-center">
-          <Avatar size="lg">
+          <Avatar className="cursor-pointer active:scale-90 transition-transform"
+            onClick={() => {
+              if (window.location.pathname !== `/profile/${post.user_id}`)
+                navigate(`/profile/${post.user_id}`, { relative: "path" });
+            }}
+            size="lg"
+          >
             <AvatarImage src={avatar_url || undefined} />
             <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
@@ -155,7 +161,7 @@ export function PostCard({
                   if (window.location.pathname !== `/feed/post/${post.id}`)
                     navigate(`/feed/post/${post.id}`);
                 }}
-                size={24}   
+                size={24}
               />
               {post.comments[0].count}
             </div>

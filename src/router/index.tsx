@@ -4,6 +4,7 @@ import { ResetPassword } from "@/features/auth/components/ResetPassword";
 import { SendResetPassword } from "@/features/auth/components/SendResetPassword";
 import { FeedPage } from "@/features/posts/components/FeedPage";
 import { PostPage } from "@/features/posts/components/PostPage";
+import { ProfilePage } from "@/features/profile/components/ProfilePage";
 import { createBrowserRouter, Navigate } from "react-router";
 import { AppLayout } from "./AppLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
           {
             path: "/feed/post/:id",
             element: <ProtectedRoute>{<PostPage />}</ProtectedRoute>,
+          },
+          {
+            path: "/profile/:id",
+            element: <ProtectedRoute>{<ProfilePage />}</ProtectedRoute>,
           },
           {
             path: "/auth/login",
