@@ -8,8 +8,8 @@ export const postSchema = z.object({
     file: z.instanceof(FileList)
         .optional()
         .refine(
-            (files) => !files || files.length === 0 || files[0].size <= 1 * 1024 * 1024,
-            'La imagen no puede superar 1MB'
+            (files) => !files || files.length === 0 || files[0].size <= 3 * 1024 * 1024,
+            'La imagen no puede superar 3MB'
         )
         .refine(
             (files) => !files || files.length === 0 || files[0].type.startsWith('image/'),
