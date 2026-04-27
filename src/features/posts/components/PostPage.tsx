@@ -12,8 +12,10 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { queryClient } from "@/lib/queryClient";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
+import { useCommentsStore } from "@/store/commentsStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
@@ -23,7 +25,7 @@ import { useCommentsQuery } from "../hooks/useCommentsQuery";
 import { useCommentsRealtime } from "../hooks/useCommentsRealtime";
 import { useDeletePost } from "../hooks/useDeletePost";
 import { useEditPost } from "../hooks/useEditPost";
-import { postKeys } from "../keys.posts";
+import { commentsKeys, postKeys } from "../keys.posts";
 import { commentSchema, type commentSchemaType } from "../schemas";
 import type { CommentWithProfile, PostWithProfileAndLikes } from "../types";
 import { CommentCard } from "./CommentCard";
@@ -95,7 +97,7 @@ export function PostPage() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useCommentsQuery(id, data?.created_at);
+  } = useCommentsQuery(id);
 
   const comments = dataComments?.pages.flatMap((page) => page.data) || [];
 
@@ -104,6 +106,16 @@ export function PostPage() {
   const { postDelete, handleDelete } = useDeletePost();
 
   const { postEdit, handleEdit, handleDialogEdit, dialogEdit } = useEditPost();
+
+  const { resetCommentsCount, newCommentsCount } = useCommentsStore();
+
+  const handleLoadComments = () => {
+    if (!id) return;
+    resetCommentsCount();
+    queryClient.removeQueries({
+      queryKey: commentsKeys.comments(id),
+    });
+  };
 
   return (
     <>
@@ -157,6 +169,13 @@ export function PostPage() {
             <h2 className="font-bold text-xl">Comentarios</h2>
             <ScrollArea>
               <div className="flex flex-col gap-5 max-h-150 pe-4">
+                {newCommentsCount > 0 && (
+                  <Button onClick={handleLoadComments}>
+                    {newCommentsCount > 1
+                      ? `Hay ${newCommentsCount} comentarios nuevos`
+                      : "Hay 1 comentario nuevo"}
+                  </Button>
+                )}
                 {comments.map((comment: CommentWithProfile) => (
                   <CommentCard
                     key={comment.id}

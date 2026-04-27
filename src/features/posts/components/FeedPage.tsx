@@ -65,6 +65,8 @@ export function FeedPage() {
             handleDelete={handleDelete}
             handlePostEdit={handleEdit}
           />
+          {isFetchingNextPage && <FullscreenLoader />}
+
           <div className="mx-auto w-full min-h-12" ref={observerRef}></div>
 
           {postDelete && (

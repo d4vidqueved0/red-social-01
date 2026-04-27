@@ -7,7 +7,7 @@ export type PostWithProfile = Post & {
 export type PostWithProfileAndLikes = PostWithProfile & {
     likes: { count: number }[]
     user_likes: { user_id: string }[] | []
-    comments: {count: number}[]
+    comments: { count: number }[]
 }
 
 
@@ -21,3 +21,7 @@ export type CommentWithProfile = Comment & {
 }
 
 
+export type CommentsPage = {
+    data: CommentWithProfile[],
+    nextPage: number | null
+}

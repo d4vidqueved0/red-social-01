@@ -75,7 +75,7 @@ export function ProfilePage() {
         />
       </div>
 
-      <div className="-mt-15 z-50 flex flex-col items-center">
+      <div className="-mt-5 z-50 flex flex-col items-center">
         <Avatar className="w-30 h-30 border-white border-2">
           <AvatarImage src={avatar_url || undefined} />
           <AvatarFallback className="text-3xl z-50">

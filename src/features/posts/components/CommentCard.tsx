@@ -39,6 +39,8 @@ export function CommentCard({
 
   const navigate = useNavigate();
 
+  console.log(comment)
+
   return (
     <article className="grid grid-cols-[1fr_10fr] gap-1">
       <Avatar

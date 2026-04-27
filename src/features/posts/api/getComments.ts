@@ -15,14 +15,13 @@ export const getComments = async ({
         .from('comments')
         .select('*, profiles(*)')
         .eq('post_id', postID)
+        .lt('created_at', pageParam)
         .order('created_at', { ascending: false })
-        .gt('created_at', pageParam)
         .limit(PAGE_SIZE + 1)
 
     if (error) throw error
 
     const hasMore = data.length > PAGE_SIZE
-
     return {
         data: hasMore ? data.slice(0, PAGE_SIZE) : data,
         nextPage: hasMore ? data[PAGE_SIZE - 1].created_at : null

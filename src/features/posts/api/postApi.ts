@@ -19,7 +19,10 @@ export async function getPosts({ pageParam }: { pageParam: Dayjs | string }) {
   comments(count)
 `).filter('user_likes.user_id', 'eq', session?.user.id)
         .order('created_at', { ascending: false })
-        .lt('created_at', pageParam).limit(PAGE_SIZE)
+        .lt('created_at', pageParam).limit(PAGE_SIZE + 1)
     if (error) throw error
-    return { data, nextPage: data.length !== 0 ? data[data.length - 1].created_at : null }
+
+    const hasMore = data.length > PAGE_SIZE
+
+    return { data: hasMore ? data.slice(0, PAGE_SIZE) : data, nextPage: hasMore ? data[PAGE_SIZE - 1].created_at : null }
 }
