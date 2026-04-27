@@ -1,12 +1,11 @@
 import { Button, FullscreenLoader } from "@/components/ui";
 import { useFeedStore } from "@/store/feedStore";
-import type { Post } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowBigUpIcon } from "lucide-react";
-import { useState } from "react";
+import { useDeletePost } from "../hooks/useDeletePost";
+import { useEditPost } from "../hooks/useEditPost";
 import { useInfiniteScroll } from "../hooks/useInfinityQuery";
 import { usePostsQuery } from "../hooks/usePostsQuery";
-import { usePostsRealtime } from "../hooks/usePostsRealtime";
 import { postKeys } from "../keys.posts";
 import { CreatePost } from "./CreatePost";
 import { DeletePost } from "./DeletePost";
@@ -24,20 +23,14 @@ export function FeedPage() {
     isFetchingNextPage,
   } = usePostsQuery();
 
-  usePostsRealtime();
-
   const { observerRef } = useInfiniteScroll({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   });
 
-  const {
-    newPostsCount,
-    resetNewPosts,
-    resetFechaInicial,
-    fechaInicial,
-  } = useFeedStore();
+  const { newPostsCount, resetNewPosts, resetFechaInicial, fechaInicial } =
+    useFeedStore();
 
   const queryClient = useQueryClient();
 
@@ -47,30 +40,11 @@ export function FeedPage() {
     resetNewPosts();
   };
 
-  const [postDelete, setDelete] = useState<string | null>(null);
+  const { postDelete, handleDelete } = useDeletePost();
 
-  const handleDelete = (id: string | null) => {
-    setDelete(id);
-  };
+  const { postEdit, handleEdit, handleDialogEdit, dialogEdit } = useEditPost();
 
   const posts = data?.pages.flatMap((page) => page.data) ?? [];
-
-  const [postEdit, setPostEdit] = useState<Post | null>(null);
-
-  const handleEdit = (post: Post | null) => {
-    if (post) {
-      setDialogEdit(true);
-    } else {
-      setDialogEdit(false);
-    }
-    setPostEdit(post);
-  };
-
-  const [dialogEdit, setDialogEdit] = useState(false);
-
-  const handleDialogEdit = () => {
-    setDialogEdit((prev) => !prev);
-  };
 
   return (
     <>

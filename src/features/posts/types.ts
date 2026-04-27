@@ -20,6 +20,4 @@ export type CommentWithProfile = Comment & {
     profiles: Profile
 }
 
-export type PostDetail = PostWithProfileAndLikes & {
-    comments: CommentWithProfile[] | []
-}
+

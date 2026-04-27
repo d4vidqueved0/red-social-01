@@ -61,16 +61,18 @@ export function usePostsRealtime() {
         (info) => {
           let inCache;
           const idPost = info.old.id;
-
-          queryClient.setQueryData(
-            postKeys.feed(fechaInicial),
+          queryClient.setQueriesData(
+            { queryKey: postKeys.all },
             (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
               inCache = inCachePosts(cacheActual, idPost);
-              if (!inCache) {
-                return cacheActual;
-              }
-              const operation = (data: PostWithProfileAndLikes[]) => {
-                return data.filter((post) => post.id !== idPost);
+              const operation = (
+                data: PostWithProfileAndLikes[] | PostWithProfileAndLikes,
+              ) => {
+                if (Array.isArray(data)) {
+                  return data.filter((post) => post.id !== idPost);
+                } else {
+                  return null;
+                }
               };
               return updateCachePosts(cacheActual, operation);
             },
@@ -88,19 +90,19 @@ export function usePostsRealtime() {
           table: "posts",
         },
         (info) => {
-          let inCache;
-          const idPost = info.new.id;
-          queryClient.setQueryData(
-            postKeys.feed(fechaInicial),
+          queryClient.setQueriesData(
+            { queryKey: postKeys.all },
             (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
-              inCache = inCachePosts(cacheActual, idPost);
-              if (!inCache) {
-                return cacheActual;
-              }
-              const operation = (data: PostWithProfileAndLikes[]) => {
-                return data.map((post) =>
-                  post.id === info.new.id ? { ...post, ...info.new } : post,
-                );
+              const operation = (
+                data: PostWithProfileAndLikes[] | PostWithProfileAndLikes,
+              ) => {
+                if (Array.isArray(data)) {
+                  return data.map((post) =>
+                    post.id === info.new.id ? { ...post, ...info.new } : post,
+                  );
+                } else {
+                  return { ...data, ...info.new };
+                }
               };
               return updateCachePosts(cacheActual, operation);
             },

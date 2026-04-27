@@ -15,7 +15,7 @@ export const getComments = async ({
         .from('comments')
         .select('*, profiles(*)')
         .eq('post_id', postID)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
         .gt('created_at', pageParam)
         .limit(PAGE_SIZE + 1)
 

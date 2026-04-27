@@ -16,7 +16,6 @@ export function RootLayout() {
             .select("*")
             .eq("id", session.user.id)
             .single();
-          console.log(data);
           useAuthStore.getState().setProfile(data);
         })();
       } else if (event === "SIGNED_OUT") {

@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
-import { useFeedStore } from "@/store/feedStore";
 import {
   useMutation,
   useQueryClient,
@@ -15,7 +14,6 @@ import { updateCachePosts } from "../utils/updateCachePosts";
 export function useToggleLike(post: PostWithProfileAndLikes) {
   const { session } = useAuthStore();
   const queryClient = useQueryClient();
-  const { fechaInicial } = useFeedStore();
 
   return useMutation({
     mutationFn: async () => {
@@ -37,44 +35,43 @@ export function useToggleLike(post: PostWithProfileAndLikes) {
     },
     onMutate: async () => {
       await queryClient.cancelQueries({
-        queryKey: postKeys.feed(fechaInicial),
+        queryKey: postKeys.all,
       });
 
-      const cacheAnterior = queryClient.getQueryData(
-        postKeys.feed(fechaInicial),
-      );
+      const cachesAnteriores = queryClient.getQueriesData({
+        queryKey: postKeys.all,
+      });
 
       const isLike = post.user_likes.length > 0;
-      console.log(
-        "todas las keys:",
-        queryClient
-          .getQueryCache()
-          .getAll()
-          .map((q) => q.queryKey),
-      );
 
-      queryClient.setQueryData(
-        postKeys.feed(fechaInicial),
+      queryClient.setQueriesData(
+        { queryKey: postKeys.all },
         (cache: InfiniteData<PostsPage, unknown> | undefined) => {
-          return updateCachePosts(cache, (posts) => {
-            console.log(cache);
-            return posts.map((p) =>
-              p.id === post.id
-                ? toggleLike(isLike, post, String(session?.user.id))
-                : p,
-            );
-          });
+          const operation = (
+            posts: PostWithProfileAndLikes[] | PostWithProfileAndLikes,
+          ) => {
+            if (Array.isArray(posts)) {
+              return posts.map((p) =>
+                p.id === post.id
+                  ? toggleLike(isLike, post, String(session?.user.id))
+                  : p,
+              );
+            } else {
+              return toggleLike(isLike, post, String(session?.user.id));
+            }
+          };
+
+          return updateCachePosts(cache, operation);
         },
       );
 
-      return { cacheAnterior };
+      return { cachesAnteriores };
     },
 
     onError: (error, _, context) => {
-      queryClient.setQueryData(
-        postKeys.feed(fechaInicial),
-        context?.cacheAnterior,
-      );
+      context?.cachesAnteriores.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data);
+      });
       console.log(context, error);
       toast.error(error.message);
     },

@@ -53,7 +53,7 @@ export function PostCard({
       try {
         await navigator.share({
           title: `Publicacion de ${post.profiles.username}`,
-          text: 'Mira esta publicacion',
+          text: "Mira esta publicacion",
           url: `${window.location.origin}/feed/post/${id}`,
         });
       } catch (error) {
@@ -152,9 +152,10 @@ export function PostCard({
               <MessageCircle
                 className="cursor-pointer active:scale-90 transition-all"
                 onClick={() => {
-                  navigate(`/feed/post/${post.id}`);
+                  if (window.location.pathname !== `/feed/post/${post.id}`)
+                    navigate(`/feed/post/${post.id}`);
                 }}
-                size={24}
+                size={24}   
               />
               {post.comments[0].count}
             </div>

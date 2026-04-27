@@ -6,7 +6,6 @@ import {
   FieldLabel,
   FullscreenLoader,
 } from "@/components/ui";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   InputGroup,
   InputGroupAddon,
@@ -15,18 +14,21 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/authStore";
-import type { Comment } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
-import { Trash } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 import { useCommentsQuery } from "../hooks/useCommentsQuery";
 import { useCommentsRealtime } from "../hooks/useCommentsRealtime";
+import { useDeletePost } from "../hooks/useDeletePost";
+import { useEditPost } from "../hooks/useEditPost";
+import { postKeys } from "../keys.posts";
 import { commentSchema, type commentSchemaType } from "../schemas";
-import type { CommentWithProfile, PostDetail } from "../types";
+import type { CommentWithProfile, PostWithProfileAndLikes } from "../types";
+import { CommentCard } from "./CommentCard";
+import { DeletePost } from "./DeletePost";
+import { EditPost } from "./EditPost";
 import { PostCard } from "./PostCard";
 
 export function PostPage() {
@@ -34,14 +36,15 @@ export function PostPage() {
 
   const { profile } = useAuthStore();
 
-  const { data, isLoading, error } = useQuery<PostDetail>({
-    queryKey: ["post", id],
+  const { data, isLoading, error } = useQuery<PostWithProfileAndLikes>({
+    queryKey: postKeys.detail(id),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
         .select(
           "*, profiles(*), likes(count),  user_likes:likes(user_id), comments(count)",
         )
+        .filter("user_likes.user_id", "eq", profile?.id)
         .eq("id", id)
         .single();
       if (error) {
@@ -53,6 +56,7 @@ export function PostPage() {
       }
       return data;
     },
+    enabled: !!id && !!profile,
   });
 
   const {
@@ -97,22 +101,9 @@ export function PostPage() {
 
   useCommentsRealtime(id);
 
-  const deleteComment = async (comment: Comment) => {
-    const { count, error } = await supabase
-      .from("comments")
-      .delete({ count: "exact" })
-      .eq("id", comment.id);
-    console.log(error);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    if (count === 0) {
-      toast.error("No tienes permiso para eliminar el comentario.");
-      return;
-    }
-    toast.success("Se eliminó el comentario.");
-  };
+  const { postDelete, handleDelete } = useDeletePost();
+
+  const { postEdit, handleEdit, handleDialogEdit, dialogEdit } = useEditPost();
 
   return (
     <>
@@ -121,11 +112,11 @@ export function PostPage() {
       )}
       {isLoading && <FullscreenLoader />}
       {!error && !isLoading && data && (
-        <div className="max-w-5xl mx-auto grid grid-cols-1 gap-3  md:grid-cols-[3fr_2fr] items-start gap-x-3">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 gap-3  md:grid-cols-[3fr_2fr] items-start gap-x-3 mb-3">
           <PostCard
             post={data}
-            handleDelete={() => {}}
-            handlePostEdit={() => {}}
+            handleDelete={handleDelete}
+            handlePostEdit={handleEdit}
           />
 
           <Card className="px-3 min-h-full max-w-2xl w-full mx-auto">
@@ -167,38 +158,11 @@ export function PostPage() {
             <ScrollArea>
               <div className="flex flex-col gap-5 max-h-150 pe-4">
                 {comments.map((comment: CommentWithProfile) => (
-                  <article
+                  <CommentCard
                     key={comment.id}
-                    className="grid grid-cols-[1fr_10fr] gap-1"
-                  >
-                    <Avatar>
-                      <AvatarImage
-                        src={comment.profiles.avatar_url || "stock.webp"}
-                      />
-                      <AvatarFallback>
-                        {comment.profiles.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="flex justify-between">
-                        <small>@{comment.profiles.username}</small>
-                        <small className="flex gap-3">
-                          {dayjs(comment.created_at).fromNow()}{" "}
-                          {(comment.user_id === profile?.id ||
-                            data.user_id === profile?.id) && (
-                            <Trash
-                              className="cursor-pointer transition-all active:scale-90"
-                              size={16}
-                              onClick={() => {
-                                deleteComment(comment);
-                              }}
-                            />
-                          )}
-                        </small>
-                      </div>
-                      <p className="break-all">{comment.content}</p>
-                    </div>
-                  </article>
+                    comment={comment}
+                    idPost={data.id}
+                  />
                 ))}
 
                 {(loadingComments || isFetchingNextPage) && (
@@ -223,6 +187,15 @@ export function PostPage() {
             </ScrollArea>
           </Card>
         </div>
+      )}
+      {postDelete && <DeletePost handleDelete={handleDelete} id={postDelete} />}
+      {postEdit && (
+        <EditPost
+          key={postEdit.id}
+          post={postEdit}
+          handleDialogEdit={handleDialogEdit}
+          open={dialogEdit}
+        />
       )}
     </>
   );

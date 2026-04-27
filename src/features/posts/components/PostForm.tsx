@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SkeletonImg } from "@/components/ui/SkeletonPosts";
 import { ImagePlus, XIcon } from "lucide-react";
 import {
   Controller,
@@ -110,7 +111,10 @@ export function PostForm({
         {preview && !errors.file && (
           <>
             <div className="relative max-w-fit">
-              <img className="max-w-xs w-full object-contain" src={preview} />
+              <div className="min-w-xs max-w-xs">
+                <SkeletonImg img={preview} />
+              </div>
+
               <Button
                 type="button"
                 onClick={() => {
