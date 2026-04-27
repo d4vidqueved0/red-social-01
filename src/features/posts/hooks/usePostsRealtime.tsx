@@ -35,9 +35,23 @@ export function usePostsRealtime() {
               user_likes: [],
               comments: [{ count: 0 }],
             };
+
+            console.log(
+              "cache feed:",
+              queryClient.getQueryData(postKeys.feed(fechaInicial)),
+            );
+            console.log("fechaInicial:", fechaInicial);
+            console.log(
+              "todas las keys:",
+              queryClient
+                .getQueryCache()
+                .getAll()
+                .map((q) => q.queryKey),
+            );
             queryClient.setQueryData(
               postKeys.profile(profile.id),
               (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
+                if (!cacheActual) return
                 const newCache = insertFirstPositionCache(
                   cacheActual,
                   newPostWithProfile,
@@ -48,6 +62,7 @@ export function usePostsRealtime() {
             queryClient.setQueryData(
               postKeys.feed(fechaInicial),
               (cacheActual: InfiniteData<PostsPage, unknown> | undefined) => {
+                if (!cacheActual) return
                 const newCache = insertFirstPositionCache(
                   cacheActual,
                   newPostWithProfile,
