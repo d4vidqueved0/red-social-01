@@ -1,5 +1,5 @@
 import LightRays from "@/components/LightRays";
-import { FullscreenLoader } from "@/components/ui";
+import { Button, FullscreenLoader } from "@/components/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DeletePost } from "@/features/posts/components/DeletePost";
 import { EditPost } from "@/features/posts/components/EditPost";
@@ -8,10 +8,12 @@ import { useDeletePost } from "@/features/posts/hooks/useDeletePost";
 import { useEditPost } from "@/features/posts/hooks/useEditPost";
 import { postKeys } from "@/features/posts/keys.posts";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/store/authStore";
+import { useMessagesStore } from "@/store/messagesStore";
 import type { Profile } from "@/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { getPostsProfile } from "../api/getPostsProfile";
 
@@ -31,7 +33,6 @@ export function ProfilePage() {
         toast.error("Error al cargar el perfil.");
         return;
       }
-      console.log(data);
       return data;
     },
     enabled: !!id,
@@ -49,11 +50,24 @@ export function ProfilePage() {
 
   const { dialogEdit, handleDialogEdit, handleEdit, postEdit } = useEditPost();
 
+  const navigate = useNavigate();
+
+  const { setProfileChat } = useMessagesStore();
+
+  const { profile } = useAuthStore();
+
   if (isLoading) return <FullscreenLoader />;
 
   if (!data) return;
 
-  const { name, username, avatar_url, biography, created_at } = data;
+  const {
+    name,
+    username,
+    avatar_url,
+    biography,
+    created_at,
+    id: idProfile,
+  } = data;
   const posts = postsData?.pages.flatMap((page) => page.data) || [];
   return (
     <section className="mx-auto w-full max-w-5xl flex flex-col items-center">
@@ -85,6 +99,18 @@ export function ProfilePage() {
         <h1 className="text-3xl mt-2">{name}</h1>
         <small className="text-lg">@{username}</small>
       </div>
+      {idProfile !== profile?.id && (
+        <Button
+          onClick={() => {
+            setProfileChat(idProfile);
+            navigate("/mensajes", { relative: "path" });
+          }}
+          className="my-3"
+        >
+          Enviar mensaje
+        </Button>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] w-full mt-12">
         <div>
           <h3>Biografia</h3>

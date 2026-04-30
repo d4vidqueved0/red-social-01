@@ -56,8 +56,7 @@ export function PostCard({
           text: "Mira esta publicacion",
           url: `${window.location.origin}/feed/post/${id}`,
         });
-      } catch (error) {
-        console.error(error);
+      } catch {
         toast.error("Error al compartir.");
       }
     } else {
@@ -66,8 +65,7 @@ export function PostCard({
           `${window.location.origin}/feed/post/${id}`,
         );
         toast.success("Enlace copiado.");
-      } catch (error) {
-        console.error(error);
+      } catch {
         toast.error("Error al copiar el enlace.");
       }
     }
@@ -77,7 +75,8 @@ export function PostCard({
     <>
       <div className="grid grid-cols-[1fr_11fr] gap-x-3 sm:gap-0 rounded-xl bg-black/50 border w-full max-w-2xl p-5 mx-auto">
         <div className="flex items-center">
-          <Avatar className="cursor-pointer active:scale-90 transition-transform"
+          <Avatar
+            className="cursor-pointer active:scale-90 transition-transform"
             onClick={() => {
               if (window.location.pathname !== `/profile/${post.user_id}`)
                 navigate(`/profile/${post.user_id}`, { relative: "path" });

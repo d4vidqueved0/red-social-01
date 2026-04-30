@@ -72,7 +72,6 @@ export function useToggleLike(post: PostWithProfileAndLikes) {
       context?.cachesAnteriores.forEach(([queryKey, data]) => {
         queryClient.setQueryData(queryKey, data);
       });
-      console.log(context, error);
       toast.error(error.message);
     },
   });

@@ -27,7 +27,6 @@ export const getPostsProfile = async ({ pageParam, queryKey }: QueryFunctionCont
         .lt('created_at', pageParam).limit(PAGE_SIZE)
     if (error) throw error
 
-    console.log(data)
 
     return { data, nextPage: data.length !== 0 ? data[data.length - 1].created_at : null }
 }

@@ -26,12 +26,12 @@ export function Header() {
     }
     toast.success("Se cerró la sesión.");
   };
-
   return (
     <header className="fixed z-50 top-0 left-0 w-full bg-black/30 backdrop-blur-xl border-b-2">
       <nav className="max-w-5xl mx-auto w-full min-h-16  flex items-center justify-between px-3">
         <div className="flex gap-12">
           <NavLink to={"/feed"}>Inicio</NavLink>
+          <NavLink to={"/mensajes"}>Mensajes</NavLink>
         </div>
 
         {session && (

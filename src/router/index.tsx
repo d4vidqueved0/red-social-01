@@ -2,6 +2,7 @@ import { LoginForm } from "@/features/auth/components/LoginForm";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import { ResetPassword } from "@/features/auth/components/ResetPassword";
 import { SendResetPassword } from "@/features/auth/components/SendResetPassword";
+import { MessagesPage } from "@/features/messages/components/MessagesPage";
 import { FeedPage } from "@/features/posts/components/FeedPage";
 import { PostPage } from "@/features/posts/components/PostPage";
 import { ProfilePage } from "@/features/profile/components/ProfilePage";
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
           {
             path: "/profile/:id",
             element: <ProtectedRoute>{<ProfilePage />}</ProtectedRoute>,
+          },
+          {
+            path: "/mensajes",
+            element: <ProtectedRoute>{<MessagesPage />}</ProtectedRoute>,
           },
           {
             path: "/auth/login",

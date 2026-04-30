@@ -17,7 +17,7 @@ export function AppLayout() {
   return (
     <div>
       <Header />
-      <main className="mt-24 px-3">
+      <main className="mt-20 px-3">
         <Outlet />
         <Toaster
           theme="dark"
